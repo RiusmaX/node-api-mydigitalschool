@@ -1,7 +1,15 @@
 const loggerMiddleware = (req, res, next) => {
-    console.info(
-        'J\'ai reçu une requête ' + req
-    )
+    if (req) {
+        console.info(
+           `Requête ${req.method} reçue de ${req.ip} à destination de ${req.url}`
+        )
+    }
+    // if (res) {
+    //     console.info(
+    //         `Réponse ${res}`
+    //     )
+    // }
+    next()
 }
 
 module.exports = Logger = loggerMiddleware
