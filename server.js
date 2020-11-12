@@ -1,7 +1,11 @@
 const express = require('express')
+const Logger = require('./tools/logger')
+
 const app = express()
 const port = 3000
 var router = express.Router()
+
+app.use(Logger)
 
 app.use(router)
 
