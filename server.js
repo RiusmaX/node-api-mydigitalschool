@@ -12,6 +12,7 @@ app.use(Logger)
 app.use(router)
 
 app.use('/', require('./routes'))
+app.use('/notes', require('./routes/notes'))
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
