@@ -30,8 +30,7 @@ router.route('/') // = localhost:PORT/notes/
     // On répond avec la liste des notes
     res.send(notes)
 })
-.post((req, res) => {
-    console.log('body', req.body)
+.post((req, res) => { // Insertion d'un nouvel élément
     // On récupère nos variables envoyée par le client
     const title = req.body.title
     const description = req.body.description
@@ -55,6 +54,58 @@ router.route('/') // = localhost:PORT/notes/
 
         // On envoit la liste mise à jour
         res.send(notes)
+    }
+})
+.delete((req, res) => { // Suppression d'un élément par son ID
+    // On récupère l'ID de la note à supprimer
+    const id = req.body.id
+
+    if (!id) {
+        res.status(500).send('L\'id est manquant')
+    } else {
+        // On recherche dans le tableau l'index de l'objet possédant l'id envoyé en paramètre
+        var index = notes.findIndex(note => {
+            return note.id === id
+        })
+
+        // Si la note est trouvée
+        if (index !== -1) {
+            // On supprime la note du tableau
+            notes.splice(index, 1)
+
+            // On renvoit la liste mise à jour
+            res.send(notes)
+        } else {
+            res.status(500).send('Impossible de trouver la note ayant pour ID ' + id)
+        }
+    }
+})
+.put((req, res) => { // Mise à jour d'un élément par son ID
+    // On récupère l'ID de la note à mettre à jour
+    const id = req.body.id
+
+    if (!id) {
+        res.status(500).send('L\'id est manquant')
+    } else {
+        // On recherche dans le tableau l'index de l'objet possédant l'id envoyé en paramètre
+        var index = notes.findIndex(o => {
+            return o.id === id
+        })
+
+        // Si la note est trouvée
+        if (index !== -1) {
+            // On récupère les informations de la requête
+            const title = req.body.title
+            const description = req.body.description
+
+            notes[index].title = title || notes[index].title
+            notes[index].description = description || notes[index].description
+            // On renvoit la liste mise à jour
+            res.send(notes)
+
+        } else {
+            res.status(500).send('Impossible de trouver la note ayant pour ID ' + id)
+        }
     }
 })
 
