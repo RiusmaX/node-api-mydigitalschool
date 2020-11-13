@@ -1,4 +1,6 @@
 const router = require('express').Router()
+// Import de la librairie de gestion des tokens
+const jwt = require('jsonwebtoken')
 
 const User = require('../../models/user')
 
@@ -80,9 +82,20 @@ router.route('/login') // <URL>:<PORT>/users/login
                     if (error) {
                         // Mots de passe non identiques
                         return res.status(500).send('Identifiants invalides')
-                    } else {
+                    } else if (isMatch) {
                         // Mots de passe identiques
-                        return res.send(user)
+                        const payload = {
+                            id: user._id
+                        }
+                        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (error, token) => {
+                            if (error) {
+                                return res.status(500).send('Erreur dans la génération du token')
+                            }
+                            return res.send({
+                                user,
+                                token
+                            })
+                        })
                     }
                 })
             }
