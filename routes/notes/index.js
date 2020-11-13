@@ -71,28 +71,26 @@ router.route('/') // = localhost:PORT/notes/
         })
     }
 })
-.put((req, res) => { // Mise à jour d'un élément par son ID
+.patch((req, res) => { // Mise à jour d'un élément par son ID
     // On récupère l'ID de la note à mettre à jour et les paramètres
     const id = req.body.id
-    const title = req.body.title
-    const description = req.body.description
-    const isEnabled = req.body.isEnabled
-    const isFavorite = req.body.isFavorite
 
     if (!id) {
         res.status(500).send('L\'id est manquant')
     } else {
         // On créé un nouvel objet node
-        const _note = {
-            // title: title,
-            title,
-            description,
-            isEnabled,
-            isFavorite
-        }
+        var _note = {}
+
+        // On construit l'objet en fonction des paramètres du body
+        if (req.body.description) _note.description = req.body.description
+        if (req.body.title) _note.title = req.body.title
+        if (req.body.isEnabled !== undefined && req.body.isEnabled !== null) _note.isEnabled = req.body.isEnabled
+        if (req.body.isFavorite !== undefined && req.body.isFavorite !== null) _note.isFavorite = req.body.isFavorite
+
         // On met à jour l'objet note
-        Note.findByIdAndUpdate(id, _note, (error, notes) => {
+        Note.findByIdAndUpdate(id, _note, { useFindAndModify: true }, (error, notes) => {
             if (error) {
+                console.error(error)
                 return res.status(500).send(error)
             } else {
                 findNotes()
