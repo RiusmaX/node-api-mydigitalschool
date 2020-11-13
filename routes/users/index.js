@@ -3,6 +3,7 @@ const router = require('express').Router()
 const jwt = require('jsonwebtoken')
 
 const User = require('../../models/user')
+const withAuth = require('../../middlewares/auth')
 
 findUsers = () => {
     return new Promise((resolve, reject) => {
@@ -17,10 +18,30 @@ findUsers = () => {
 }
 
 router.route('/') // <URL>:<PORT>/users
-.get((req, res) => {
-    findUsers()
-    .then(users => res.send(users))
+.get(withAuth, (req, res) => {
+    // Récupération du token
+    const token = req.headers.authorization.split(' ')[1]
+    const id = jwt.decode(token).id
+    // Fonction avec callback
+    // User.findById(id, (error, user) => {
+    //     if (error) {
+    //         return res.status(500).send(error)
+    //     } else {
+    //         return res.send(user)
+    //     }
+    // })
+
+    // Fonction avec promesse
+    User.findById(id).select('-password')
+    .then(user => res.send(user))
     .catch(error => res.status(500).send(error))
+
+    // Promesse avec return 
+    // User.findById(id).select('-password')
+    // .then(user => {
+    //     return res.send(user)
+    // })
+    // .catch(error => res.status(500).send(error))
 })
 
 // Route imbriquée (sous-route)
@@ -84,13 +105,16 @@ router.route('/login') // <URL>:<PORT>/users/login
                         return res.status(500).send('Identifiants invalides')
                     } else if (isMatch) {
                         // Mots de passe identiques
+                        // On prépare le payload du token (informations contenues dans le token)
                         const payload = {
                             id: user._id
                         }
+                        // Génération du token d'accès (payload + secret + options)
                         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (error, token) => {
                             if (error) {
                                 return res.status(500).send('Erreur dans la génération du token')
                             }
+                            // Envoi du user + token en réponse
                             return res.send({
                                 user,
                                 token
