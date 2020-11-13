@@ -1,11 +1,18 @@
 const router = require('express').Router()
 
+// Import du modèle Mongoose Note
+const Note = require('../../models/note')
+
 // Nous sommes déjà dans /notes
 router.route('/') // = localhost:PORT/notes/
 .get((req, res) => { // Récupération de la liste de notes
-
-    // On répond avec la liste des notes
-    res.send(notes)
+    Note.find((error, notes) => {
+        if (error) {
+           return res.status(500).send(error)
+        }
+        // On répond avec la liste des notes
+        return res.send(notes)
+    })
 })
 .post((req, res) => { // Insertion d'un nouvel élément
     // On récupère nos variables envoyée par le client
@@ -19,11 +26,26 @@ router.route('/') // = localhost:PORT/notes/
         res.status(500).send('La description est manquante')
     } else {
         // La data est OK
-        
-        // On ajoute la note à la liste
+        const note = new Note()
+        note.title = title
+        note.description = description
 
-        // On envoit la liste mise à jour
-        res.send(notes)
+        // On ajoute la note à la base de données
+        note.save((error, note) => {
+            // Traitement des erreurs
+            if (error) {
+                return res.status(500).send(error)
+            }
+
+            // Récupération de la liste des notes
+            Note.find((error, notes) => {
+                if (error) {
+                    return res.status(500).send(error)
+                }
+                // On envoit la liste des notes
+                return res.send(notes)
+            })
+        })
     }
 })
 .delete((req, res) => { // Suppression d'un élément par son ID
