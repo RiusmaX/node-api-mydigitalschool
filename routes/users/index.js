@@ -14,7 +14,7 @@ findUsers = () => {
     })
 }
 
-router.route('/')
+router.route('/') // <URL>:<PORT>/users
 .get((req, res) => {
     findUsers()
     .then(users => res.send(users))
@@ -54,6 +54,37 @@ router.route('/register') // <URL>:<PORT>/users/register
                 return res.status(500).send(error)
             } else {
                 return res.send(user)
+            }
+        })
+    }
+})
+
+router.route('/login') // <URL>:<PORT>/users/login
+.post((req, res) => {
+    // Collecte des paramètres de la requête
+    const email = req.body.email
+    const password = req.body.password
+
+    if (!email) {
+        return res.status(500).send('Email manquant')
+    } else if (!password) {
+        return res.status(500).send('Mot de passe manquant')
+    } else {
+        // Récupération de l'utilisateur
+        User.findOne({email: email}, (error, user) => {
+            if (error) {
+                return res.status(500).send('Identifiants invalides')
+            } else {
+                // Comparaison du mot de passe
+                user.comparePassword(password, (error, isMatch) => {
+                    if (error) {
+                        // Mots de passe non identiques
+                        return res.status(500).send('Identifiants invalides')
+                    } else {
+                        // Mots de passe identiques
+                        return res.send(user)
+                    }
+                })
             }
         })
     }

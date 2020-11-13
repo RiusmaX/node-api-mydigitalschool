@@ -57,12 +57,12 @@ UserSchema.pre('save', function (next) {
     }
 })
 
-UserSchema.methods.comparePassword = (password, cb) => {
-    bcrypt.compare(password, this.password, (error, isMatch) => {
+UserSchema.methods.comparePassword = function (pw, callback) {
+    bcrypt.compare(pw, this.password, (error, isMatch) => {
         if (error) {
-            return cb(error)
+            return callback(error)
         }
-        cb(null, isMatch)
+        callback(null, isMatch)
     })
 }
 
