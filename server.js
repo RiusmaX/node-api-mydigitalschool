@@ -59,6 +59,7 @@ app.use(router)
 app.use('/', require('./routes'))
 app.use('/notes', require('./routes/notes'))
 app.use('/users', require('./routes/users'))
+app.use('/emails', require('./routes/emails'))
 
 // Start server listening
 app.listen(port, () => {
